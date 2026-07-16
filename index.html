@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TACET · Private Office — merit-based residence and citizenship</title>
+<meta name="description" content="Residence and citizenship programmes for founders, professionals and their families. Merit routes — UK, US, EU — executed in-house. 250 cases filed since 2021, 99.6% approval rate.">
+<link rel="alternate" hreflang="en" href="https://tacet.group/">
+<link rel="alternate" hreflang="ru" href="https://tacet.group/ru.html">
+<link rel="alternate" hreflang="zh" href="https://tacet.group/zh.html">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F7F5EF;--ink:#1C1A16;--graphite:#6F6A5F;--hairline:#D8D4C8;--oxblood:#7E2622;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--paper);color:var(--ink);font-family:'EB Garamond',serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 40px;}
+  a{color:inherit;}
+
+  header.top{display:flex;justify-content:space-between;align-items:center;padding:20px 0;}
+  .wordmark-s{font-size:17px;letter-spacing:0.30em;padding-left:0.30em;text-decoration:none;}
+  nav{display:flex;gap:34px;}
+  nav a{white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--graphite);text-decoration:none;}
+  nav a:hover{color:var(--ink);}
+  .langs{display:flex;gap:14px;margin-left:34px;}
+  .langs a{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10.5px;letter-spacing:0.12em;color:var(--graphite);text-decoration:none;}
+  .langs a.cur{color:var(--ink);border-bottom:1px solid var(--oxblood);}
+  header.top{gap:20px;}
+  .toprule{height:1px;background:var(--hairline);}
+  .sitehead{position:sticky;top:0;z-index:100;background:var(--paper);border-bottom:1px solid var(--hairline);}
+  section,[id]{scroll-margin-top:86px;}
+
+  .hero{padding:120px 0 100px;text-align:center;}
+  .wordmark{font-size:clamp(60px,9vw,116px);line-height:0.95;letter-spacing:0.30em;padding-left:0.30em;font-weight:400;}
+  .descriptor{font-family:'IBM Plex Mono',monospace;font-size:clamp(11px,1.4vw,15px);letter-spacing:0.46em;padding-left:0.46em;text-transform:uppercase;color:var(--graphite);margin-top:28px;}
+  .accent{width:44px;height:2px;background:var(--oxblood);margin:36px auto 0;}
+  .lede{font-size:clamp(17px,2vw,21px);line-height:1.55;max-width:640px;margin:42px auto 0;}
+  .doors{display:flex;justify-content:center;gap:18px;margin-top:52px;flex-wrap:wrap;}
+  .door{display:inline-block;border:1px solid var(--ink);padding:16px 34px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink);text-decoration:none;}
+  .door:hover{background:var(--ink);color:var(--paper);}
+  .door.secondary{border-color:var(--hairline);color:var(--graphite);}
+  .door.secondary:hover{border-color:var(--ink);background:transparent;color:var(--ink);}
+  .heromenta{margin-top:64px;}
+  .heromenta .mono{font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--graphite);}
+
+  section{padding:96px 0;}
+  .kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--graphite);margin-bottom:30px;}
+  .kicker::before{content:"";display:block;width:24px;height:1px;background:var(--hairline);margin-bottom:12px;}
+  h2{font-weight:400;font-size:clamp(26px,3.2vw,40px);line-height:1.2;max-width:840px;}
+
+  table{width:100%;border-collapse:collapse;margin-top:44px;}
+  th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--graphite);font-weight:500;text-align:left;padding:0 16px 12px 0;border-bottom:1px solid var(--ink);}
+  td{font-size:16.5px;line-height:1.4;padding:16px 16px 16px 0;border-bottom:1px solid var(--hairline);vertical-align:top;}
+  td.m{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;color:var(--ink);line-height:1.6;}
+
+  .cta-line{margin-top:44px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;}
+  .note{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--graphite);line-height:2;}
+
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;margin-top:56px;padding-top:40px;border-top:1px solid var(--hairline);}
+  .stat-n{font-size:clamp(44px,5.5vw,76px);line-height:1;}
+  .stat-l{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--graphite);margin-top:12px;line-height:1.9;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:64px;}
+  .cell{border-top:1px solid var(--ink);padding-top:20px;}
+  .cell .label{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.22em;text-transform:uppercase;color:var(--graphite);margin-bottom:14px;}
+  .cell p{font-size:18px;line-height:1.55;max-width:470px;}
+
+  .rules{margin-top:44px;}
+  .rules td:first-child{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;width:220px;color:var(--ink);}
+
+
+  footer{border-top:1px solid var(--hairline);padding:56px 0 48px;}
+  .fgrid{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;}
+  .fcol .mono{font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--graphite);line-height:2.2;}
+  .fcol .mono a{text-decoration:none;color:var(--ink);}
+  .perimeter{font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--graphite);margin-top:40px;line-height:2;border-top:1px solid var(--hairline);padding-top:16px;}
+
+  @media (max-width:760px){
+    nav{display:none;}
+    .langs{margin-left:0;}
+    .hero{padding:80px 0 70px;}
+    section{padding:64px 0;}
+    .stats{grid-template-columns:1fr;gap:30px;}
+    .split{grid-template-columns:1fr;}
+    table,thead,tbody,tr{display:block;}
+    th{display:none;}
+    td{display:block;border-bottom:none;padding:4px 0;}
+    tr{border-bottom:1px solid var(--hairline);padding:14px 0;display:block;}
+    .rules td:first-child{width:auto;}
+  }
+</style>
+</head>
+<body>
+
+<div class="sitehead">
+  <div class="wrap">
+    <header class="top">
+      <a class="wordmark-s" href="#top">TACET</a>
+      <nav>
+        <a href="#about">About</a>
+        <a href="#practice">Talent Practice</a>
+        <a href="#capital">Capital routes</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="langs"><a href="index.html" class="cur">EN</a><a href="ru.html">RU</a><a href="zh.html">中文</a></div>
+    </header>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="wrap">
+  <section class="hero" id="top" style="padding-bottom:110px;">
+    <h1 class="wordmark">TACET</h1>
+    <div class="descriptor">Private Office</div>
+    <div class="accent"></div>
+    <p class="lede">Residence and citizenship programmes for founders, professionals and their families. Merit routes — United Kingdom, United States, European Union — executed in-house; capital routes through vetted providers.</p>
+    <div class="doors">
+      <a class="door" href="#practice">Talent Practice</a>
+      <a class="door secondary" href="mailto:office@tacet.group?subject=Case%20discussion&body=Country%20/%20status%20of%20interest%3A%0AGoal%3A%0ATiming%3A%0A%0A">Discuss a case</a>
+    </div>
+    <div class="heromenta">
+      <span class="mono">Est. MMXXI · San Francisco · London · Berlin · Hong Kong</span>
+    </div>
+  </section>
+</div>
+
+<div class="toprule"></div>
+
+<!-- ABOUT -->
+<div class="wrap">
+  <section id="about">
+    <div class="kicker">About</div>
+    <h2>TACET is organised as a practice and an office. Every engagement begins with a written assessment — within five business days.</h2>
+    <div class="stats">
+      <div>
+        <div class="stat-n">250</div>
+        <div class="stat-l">Talent and residence cases<br>filed by TACET principals<br>since 2021</div>
+      </div>
+      <div>
+        <div class="stat-n">99.6%</div>
+        <div class="stat-l">Approval rate</div>
+      </div>
+      <div>
+        <div class="stat-n" style="color:var(--oxblood);">1</div>
+        <div class="stat-l">Refusal since 2021 —<br>procedural, not on merits</div>
+      </div>
+    </div>
+    <div class="mono" style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--graphite);margin-top:26px;">Per-programme breakdown available on request</div>
+    <div class="split">
+      <div class="cell">
+        <div class="label">The Practice · since 2021</div>
+        <p>The Talent Practice assesses, prepares and manages each case: UK Global Talent, UK Innovator Founder, US O-1 and EB-1, France Carte Talent, Spain Digital Nomad. Filings and regulated advice are handled by qualified professionals in each jurisdiction.</p>
+      </div>
+      <div class="cell">
+        <div class="label">The Office · Est. MMXXI</div>
+        <p>TACET · Private Office serves families under long-term engagement: residence renewals and settlement calendars, capital routes through vetted providers, private access to Geneva longevity practice. By invitation, after a completed case.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="toprule"></div>
+
+<!-- PRACTICE -->
+<div class="wrap">
+  <section id="practice">
+    <div class="kicker">Talent Practice</div>
+    <h2>Five programmes. Qualification, not capital.</h2>
+    <table>
+      <tr><th style="width:220px;">Programme</th><th>Basis</th><th style="width:240px;">Status &amp; settlement</th><th style="width:150px;">Typical timeline</th></tr>
+      <tr><td>UK · Global Talent</td><td>Endorsed achievement in tech, science or arts. No employer, no investment.</td><td>Visa up to 5 years; ILR in 3–5 years; family included</td><td class="m">8–14 WEEKS</td></tr>
+      <tr><td>UK · Innovator Founder</td><td>Endorsed innovative, viable, scalable business. No fixed minimum investment.</td><td>ILR in 3 years; family included</td><td class="m">3–4 MONTHS</td></tr>
+      <tr><td>US · O-1 / EB-1</td><td>Extraordinary ability. O-1 has no annual quota; EB-1 allows self-petition.</td><td>O-1: 3 years + extensions; EB-1: green card; family included</td><td class="m">PREP 6–10 WKS + 15 BUSINESS DAYS (PREMIUM)</td></tr>
+      <tr><td>France · Carte Talent</td><td>Founders, qualified professionals, investors in their own venture.</td><td>4-year card, renewable; family same term</td><td class="m">2–4 MONTHS</td></tr>
+      <tr><td>Spain · Digital Nomad</td><td>Remote income from ~€2,800 per month, documented.</td><td>3-year card; PR at 5 years; family included</td><td class="m">1–3 MONTHS</td></tr>
+    </table>
+    <div class="cta-line">
+      <a class="door" href="mailto:office@tacet.group?subject=Case%20discussion&body=Country%20/%20status%20of%20interest%3A%0AGoal%3A%0ATiming%3A%0A%0A">Discuss a case</a>
+      <span class="note">Written assessment — free, within 5 business days · Fees are fixed in the engagement letter</span>
+    </div>
+  </section>
+</div>
+
+
+<div class="toprule"></div>
+
+<!-- CAPITAL -->
+<div class="wrap">
+  <section id="capital">
+    <div class="kicker">Capital routes</div>
+    <h2>When qualification is not the route — investment programmes, screened and executed through vetted providers.</h2>
+    <table>
+      <tr><td style="width:260px;">Citizenship by investment</td><td class="m">TURKEY · VANUATU · SÃO TOMÉ &amp; PRÍNCIPE · NAURU · EL SALVADOR · ISRAEL (REPATRIATION)</td></tr>
+      <tr><td>Permanent residence</td><td class="m">BULGARIA · CYPRUS · PANAMA · QATAR · SAUDI ARABIA</td></tr>
+      <tr><td>Residence by investment</td><td class="m">HUNGARY (10-YEAR CARD) · UAE GOLDEN VISA (10 YEARS) · GREECE · PORTUGAL</td></tr>
+      <tr><td>Residence without investment</td><td class="m">MONACO · FRANCE · ITALY · SPAIN · PORTUGAL · LUXEMBOURG · MALTA · ANDORRA · UAE · QATAR · CIS</td></tr>
+    </table>
+    <div class="cta-line">
+      <a class="door" href="mailto:office@tacet.group?subject=Case%20discussion&body=Country%20/%20status%20of%20interest%3A%0AGoal%3A%0ATiming%3A%0A%0A">Discuss a case</a>
+      <span class="note">Route selection at assessment · Sanctions and source-of-funds screening before any engagement</span>
+    </div>
+  </section>
+</div>
+
+
+<!-- FOOTER / CONTACT -->
+<footer id="contact">
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fcol">
+        <div style="font-size:20px;letter-spacing:0.30em;padding-left:0.30em;">TACET</div>
+        <div class="mono" style="margin-top:10px;">Private Office · Est. MMXXI</div>
+      </div>
+      <div class="fcol">
+        <div class="mono">Clients — <a href="mailto:office@tacet.group">office@tacet.group</a><br>Partners — <a href="mailto:partners@tacet.group">partners@tacet.group</a></div>
+      </div>
+      <div class="fcol">
+        <div class="mono">San Francisco · London · Berlin · Hong Kong<br>Health destination · Geneva</div>
+      </div>
+    </div>
+    <div class="perimeter">TACET does not provide legal, tax or asset-management advice — those remain with the client's advisors · © MMXXVI TACET · tacet.group</div>
+  </div>
+</footer>
+
+</body>
+</html>
