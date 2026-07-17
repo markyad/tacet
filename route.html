@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TACET · Route finder — preliminary route selection</title>
+<meta name="description" content="Preliminary selection of residence and citizenship routes. Confirmed at a written assessment — free, within five business days. TACET · Private Office.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@400;500&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F7F5EF;--ink:#1C1A16;--graphite:#6F6A5F;--hairline:#D8D4C8;--oxblood:#7E2622;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--paper);color:var(--ink);font-family:'EB Garamond','Noto Serif SC',serif;}
+  .mono{font-family:'IBM Plex Mono','Noto Sans SC',monospace;}
+  .wrap{max-width:840px;margin:0 auto;padding:28px 40px 100px;}
+  header.top{display:flex;justify-content:space-between;align-items:center;padding-bottom:22px;border-bottom:1px solid var(--hairline);margin-bottom:48px;}
+  .wordmark-s{font-size:17px;letter-spacing:0.30em;padding-left:0.30em;text-decoration:none;color:var(--ink);}
+  .kicker{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--graphite);}
+  .kicker::before{content:"";display:block;width:24px;height:1px;background:var(--hairline);margin-bottom:12px;}
+  .kicker{margin-bottom:26px;}
+  .langs{display:flex;gap:14px;}
+  .langs a{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10.5px;letter-spacing:0.12em;color:var(--graphite);text-decoration:none;cursor:pointer;}
+  .langs a.cur{color:var(--ink);border-bottom:1px solid var(--oxblood);}
+  h2{font-weight:400;font-size:clamp(24px,3vw,34px);line-height:1.25;max-width:640px;}
+  .trail{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--graphite);margin-bottom:34px;line-height:2.1;min-height:20px;}
+  .trail b{color:var(--ink);font-weight:500;}
+  .opts{margin-top:40px;display:flex;flex-direction:column;}
+  .opt{display:block;width:100%;text-align:left;background:none;border:none;border-top:1px solid var(--hairline);padding:20px 8px 20px 0;cursor:pointer;font-family:'EB Garamond','Noto Serif SC',serif;color:var(--ink);}
+  .opt:last-child{border-bottom:1px solid var(--hairline);}
+  .opt:hover .ol{color:var(--oxblood);}
+  .opt .ol{font-size:19px;line-height:1.35;display:block;}
+  .opt .od{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--graphite);margin-top:6px;display:block;line-height:1.8;}
+  .back{background:none;border:none;cursor:pointer;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--graphite);margin-top:36px;padding:0;}
+  .back:hover{color:var(--ink);}
+  .rescard{border-top:1px solid var(--ink);margin-top:40px;padding-top:24px;}
+  .rescard .rlabel{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:var(--oxblood);margin-bottom:18px;}
+  .prog{margin-bottom:26px;}
+  .prog .pname{font-size:24px;line-height:1.25;}
+  .prog .pmeta{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--graphite);margin-top:8px;line-height:1.9;}
+  .prog .pdesc{font-size:16px;line-height:1.55;margin-top:8px;max-width:600px;}
+  .altblock{border-top:1px solid var(--hairline);margin-top:8px;padding-top:20px;}
+  .altblock .rlabel2{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--graphite);margin-bottom:14px;}
+  .alt{margin-bottom:14px;}
+  .alt .aname{font-size:17px;}
+  .alt .ameta{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--graphite);margin-top:3px;line-height:1.8;}
+  .resnote{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9.5px;letter-spacing:0.1em;text-transform:uppercase;color:var(--oxblood);line-height:1.9;margin-top:6px;}
+  .cta-line{margin-top:40px;display:flex;align-items:center;gap:26px;flex-wrap:wrap;}
+  .door{display:inline-block;border:1px solid var(--ink);padding:16px 34px;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink);text-decoration:none;}
+  .door:hover{background:var(--ink);color:var(--paper);}
+  .note{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9.5px;letter-spacing:0.14em;text-transform:uppercase;color:var(--graphite);line-height:2;}
+  .perimeter{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--graphite);margin-top:56px;line-height:2;border-top:1px solid var(--hairline);padding-top:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="wordmark-s" id="homelink" href="index.html">TACET</a>
+    <div class="langs"><a data-lang="en" class="cur">EN</a><a data-lang="ru">RU</a><a data-lang="zh">中文</a></div>
+  </header>
+  <div class="kicker" id="kicker"></div>
+  <div id="app"></div>
+  <div class="perimeter" id="perimeter"></div>
+</div>
+
+<script>
+/* ================= STRUCTURE — single source, language-independent ================= */
+const GRAPH = {
+  nodes:{
+    passport:{opts:[{v:'ru',next:'goal'},{v:'cn',next:'goal'},{v:'cis',next:'goal'},{v:'other',next:'goal'}]},
+    goal:{opts:[
+      {v:'citizenship',next:{default:'jewish',cn:'budget'}},
+      {v:'pr',next:'region'},
+      {v:'residence',next:'profile'},
+      {v:'country',next:'which'},
+      {v:'constraint',next:'limit'}]},
+    jewish:{opts:[{v:'yes',res:'r_israel'},{v:'no',next:'budget'}]},
+    budget:{opts:[{v:'b1',res:'r_cit_low'},{v:'b2',res:'r_cit_mid'},{v:'b3',res:'r_cit_high'},{v:'b0',res:'r_cit_none'}]},
+    region:{opts:[{v:'eu',res:'r_pr_eu'},{v:'gulf',res:'r_pr_gulf'},{v:'am',res:'r_pr_am'},{v:'open',res:'r_pr_all'}]},
+    profile:{opts:[{v:'merit',res:'r_res_merit'},{v:'income',res:'r_res_income'},{v:'funds',res:'r_res_funds'},{v:'biz',res:'r_res_biz'},{v:'invest',res:'r_res_invest'},{v:'budget',res:'r_res_budget'}]},
+    which:{opts:[{v:'uk',next:'ukq'},{v:'us',next:'usq'},{v:'eu',next:'profile'}]},
+    ukq:{opts:[{v:'ach',res:'r_gt'},{v:'plan',res:'r_inf'},{v:'none',res:'r_uk_none'}]},
+    usq:{opts:[{v:'career',res:'r_o1'},{v:'company',res:'r_l1'},{v:'treaty',res:'r_e2'},{v:'capital',res:'r_e2t'},{v:'eb5',res:'r_eb5'},{v:'none',res:'r_us_none'}]},
+    limit:{opts:[{v:'cap',next:'capprofile'},{v:'ops',res:'r_ops'},{v:'closed',res:'r_closed'}]},
+    capprofile:{opts:[{v:'income',res:'r_cap_dn'},{v:'merit',res:'r_cap_ct'},{v:'funds',res:'r_cap_fin'},{v:'invest',res:'r_cap_inv'},{v:'none',res:'r_cap_none'}]}
+  },
+  res:{
+    r_israel:  {p:['israel'], a:['turkey','elsal'], pn:['cn']},
+    r_cit_low: {p:['saotome'], a:['vanuatu'], pn:['cn']},
+    r_cit_mid: {p:['vanuatu','turkey'], a:[{k:'grenada',not:'ru'},'saotome','nauru'], pn:['cn']},
+    r_cit_high:{p:['turkey','elsal'], a:['saotome',{k:'grenada',not:'ru'}], pn:['cn']},
+    r_cit_none:{p:['fin','ct'], a:['dn','panama'], pn:['cn']},
+    r_pr_eu:   {p:['cyprus','bulgaria'], a:['hungary','uaegv']},
+    r_pr_gulf: {p:['qatarpr','saudi'], a:['uaegv']},
+    r_pr_am:   {p:['panama'], a:['qatarpr']},
+    r_pr_all:  {p:['cyprus','panama'], a:['qatarpr','bulgaria','saudi']},
+    r_res_merit:{p:['ct'], a:['gt','o1'], jump:{node:'which',via:3}},
+    r_res_income:{p:['dn'], a:['greecedn','ct']},
+    r_res_funds:{p:['fin'], a:['uaegv','monaco','malta','andorra']},
+    r_res_biz: {p:['uaeco','qatarbiz'], a:['l1','e2']},
+    r_res_invest:{p:['hungary','uaegv'], a:['greecegv','portgv']},
+    r_res_budget:{p:['cisr'], a:['uaeco']},
+    r_gt:      {p:['gt'], a:['inf']},
+    r_inf:     {p:['inf'], a:['gt']},
+    r_uk_none: {p:[], a:['ct','dn']},
+    r_o1:      {p:['o1'], a:['l1']},
+    r_l1:      {p:['l1'], a:['o1','e2']},
+    r_e2:      {p:['e2'], a:['l1']},
+    r_e2t:     {p:[{k:'turkey',not:'cn'},{k:'grenada',only:'cn'},'e2'], a:['l1','eb5',{k:'grenada',not:['cn','ru']}], pn:['cn']},
+    r_eb5:     {p:['eb5'], a:['e2','l1']},
+    r_us_none: {p:[], a:['o1']},
+    r_cap_dn:  {p:['dn'], a:['fin','cyprus']},
+    r_cap_ct:  {p:['ct'], a:['fin','cyprus']},
+    r_cap_fin: {p:['fin'], a:['cyprus','malta']},
+    r_cap_inv: {p:['cyprus','hungary'], a:['greecegv']},
+    r_cap_none:{p:['uaeco','cisr'], a:['qatarbiz']},
+    r_ops:     {p:['uaeco','qatarbiz'], a:['cisr']},
+    r_closed:  {p:['turkey','vanuatu'], a:[{k:'grenada',not:'ru'},'saotome','elsal','hungary','greecegv','portgv'], pn:['cn']}
+  }
+};
+
+/* ================= TEXT LAYERS ================= */
+const T = {
+/* ---------------- EN ---------------- */
+en:{
+ui:{kicker:'Route finder · Preliminary', back:'&larr; Back', restart:'Start over', cta:'Request an assessment',
+    ctaNote:'Written assessment — free, within 5 business days<br>Fees are fixed in the engagement letter',
+    rlabel:'Preliminary route', rlabel2:'Also considered at assessment',
+    perimeter:'Indicative only — the route is confirmed at a written assessment, free, within five business days · Sanctions and source-of-funds screening before any engagement · No data is collected or stored by this page',
+    mailHead:'Route finder profile:', mailTail:'Goal:\nTiming:\n\n'},
+cnCit:'PRC NATIONALITY LAW — VOLUNTARY ACQUISITION OF A FOREIGN CITIZENSHIP ENDS CHINESE NATIONALITY · FACTORED INTO THE ROUTE AT ASSESSMENT',
+nodes:{
+  passport:{q:'Which passport do you hold?',k:'PASSPORT',o:[['Russia / Belarus','Programme list adjusted for current restrictions'],['China','Programme list adjusted for PRC-specific rules'],['Other CIS','Full matrix, verified per passport at assessment'],['Other','Full matrix']]},
+  goal:{q:'What should be true at the end?',k:'GOAL',o:[['A second citizenship','Passport, mobility, structuring'],['Permanent residence now','Long-term status, short of citizenship'],['A residence base','Relocation, family, mobility, taxes'],['A specific country — UK, US or EU','Destination first, route second'],['Remove a specific constraint','Bank caps, payments, a programme that closed']]},
+  jewish:{q:'Jewish roots — yourself, parents or grandparents?',k:'ORIGIN',o:[['Yes','Origin-based citizenship, no investment'],['No','']]},
+  budget:{q:'Contribution budget?',k:'BUDGET',o:[['Up to ~$150,000',''],['~$150,000 – 500,000',''],['$500,000 and above',''],['No capital to commit','Naturalisation path — residence first']]},
+  region:{q:'Which region?',k:'REGION',o:[['European Union',''],['The Gulf',''],['The Americas · territorial taxation',''],['Open — best structural fit','']]},
+  profile:{q:'Which describes you best?',k:'PROFILE',o:[['Documented achievements, a founder, or a qualified professional','Merit routes — no capital locked'],['Remote income from ~€2,800 per month',''],['Savings or passive income','No investment required'],['An operating business of my own',''],['Capital I am ready to place','Investment residence'],['Minimal budget — a fallback base','']]},
+  which:{q:'Which destination?',k:'DESTINATION',o:[['United Kingdom',''],['United States',''],['European Union','']]},
+  ukq:{q:'Do you have documented achievement in tech, science or arts — or a business you would run in the UK?',k:'UK PROFILE',o:[['Documented achievement','Awards, press, senior roles, an exit'],['A business I would found and run',''],['Neither, as far as I can tell','']]},
+  usq:{q:'Which describes you best?',k:'US PROFILE',o:[['A documented career or a company sold',''],['An operating company outside the US',''],['I hold a treaty-country passport','Eligible for E-2 directly'],['Capital ~$500,000 — an active US business','Treaty citizenship first, then an investor visa'],['Capital from ~$800,000 — a passive route','Direct green card by investment'],['None of these','']]},
+  limit:{q:'Which constraint?',k:'CONSTRAINT',o:[['EU bank accounts capped at €100,000',''],['Payments, contracts, operating restrictions',''],['The programme I had in mind has closed','Caribbean, Malta, golden visas']]},
+  capprofile:{q:'The cap lifts with any EU residence permit. How would you qualify for one?',k:'CAP PROFILE',o:[['Remote income from ~€2,800 per month',''],['Founder or qualified professional',''],['Savings or passive income',''],['Capital to place',''],['None of these','']]}
+},
+progs:{
+  gt:{n:'UK · Global Talent',m:'8–14 WEEKS · ILR IN 3–5 YEARS · FAMILY INCLUDED',d:'Endorsed achievement in tech, science or arts. No employer, no investment.'},
+  inf:{n:'UK · Innovator Founder',m:'3–4 MONTHS · ILR IN 3 YEARS · FAMILY INCLUDED',d:'Endorsed innovative, viable, scalable business. No fixed minimum investment.'},
+  o1:{n:'US · O-1 → EB-1',m:'PREP 6–10 WKS + 15 BUSINESS DAYS (PREMIUM)',d:'Extraordinary ability. O-1 has no annual quota; EB-1 is a green card by self-petition.',f:{cn:'EB-1 FOR MAINLAND-CHINA BORN — MULTI-YEAR VISA-BULLETIN QUEUE; O-1 IS UNAFFECTED'}},
+  ct:{n:'France · Carte Talent',m:'2–4 MONTHS · 4-YEAR CARD · FAMILY SAME TERM',d:'Founders, qualified professionals, investors in their own venture.'},
+  dn:{n:'Spain · Digital Nomad',m:'1–3 MONTHS · 3-YEAR CARD · PR AT 5 YEARS',d:'Documented remote income from ~€2,800 per month. Family in one application.'},
+  israel:{n:'Israel · Repatriation',m:'ORIGIN-BASED · NO INVESTMENT · 155+ DESTINATIONS',d:'Citizenship by descent: archives, case file and consular process.'},
+  turkey:{n:'Turkey · Citizenship',m:'4–8 MONTHS · 100+ DESTINATIONS · GATEWAY TO US E-2',d:'Real-estate or financial route. A structuring instrument as much as a passport.'},
+  vanuatu:{n:'Vanuatu · Citizenship',m:'1–2 MONTHS · FASTEST OPEN PROGRAMME',d:'Contribution route. Schengen and UK visa-free access cancelled 2023–24 — verified against the goal at assessment.'},
+  saotome:{n:'São Tomé & Príncipe',m:'2–5 MONTHS · CHILDREN TO 30 · PARENTS 55+',d:'Contribution route with the widest family eligibility among open programmes.'},
+  nauru:{n:'Nauru · Citizenship',m:'3–4 MONTHS',d:'Access to the UK, Singapore, Hong Kong, the UAE and Ireland.',f:{ru:'LIMITED FOR RU/BY PASSPORTS'}},
+  grenada:{n:'Grenada · Citizenship',m:'US E-2 TREATY COUNTRY',d:'Contribution or real-estate route; the direct pairing for a US E-2 business visa.',f:{ru:'SUSPENDED FOR RU/BY SINCE 2023'}},
+  elsal:{n:'El Salvador · Citizenship',m:'1–3 MONTHS · QUOTA 1,000/YEAR',d:'USD, BTC or USDT accepted. Family at no extra contribution. Access to Schengen, Japan and Korea.'},
+  cyprus:{n:'Cyprus · Permanent residence',m:'2–3 MONTHS',d:'Fast EU permanent status; lifts the €100,000 EU bank cap. Does not itself give Schengen visa-free travel.'},
+  bulgaria:{n:'Bulgaria · Permanent residence',m:'6–8 MONTHS · EU CITIZENSHIP PATH AFTER 5 YEARS',d:'Returnable-investment or financing route; no residence requirement.'},
+  panama:{n:'Panama · Permanent residence',m:'2–4 MONTHS · 1 VISIT PER 2 YEARS',d:'Territorial taxation. Citizenship possible after 5 years.'},
+  qatarpr:{n:'Qatar · Permanent residence',m:'FROM 3 WEEKS',d:'Qatari banking access, no personal income tax.'},
+  saudi:{n:'Saudi Arabia · Premium residency',m:'1–3 MONTHS',d:'Annual fee or lifetime option; local banking and companies.'},
+  hungary:{n:'Hungary · Guest investor',m:'3–6 MONTHS · 10-YEAR CARD + 10-YEAR EXTENSION',d:'Returnable fund investment; unrestricted Schengen travel, no residence requirement.'},
+  uaegv:{n:'UAE · Golden Visa',m:'DAYS TO 3 MONTHS · 10 YEARS · NO MINIMUM STAY',d:'Asset route — or nomination by income, with no asset at all. Family and staff included.'},
+  greecegv:{n:'Greece · Golden Visa',m:'3–6 MONTHS · 5-YEAR CARD',d:'The property may be rented out.',f:{ru:'RU/BY — ONLY WITH AN ALTERNATIVE CITIZENSHIP'}},
+  portgv:{n:'Portugal · Golden Visa',m:'6–12 MONTHS · 8 DAYS/YEAR · CITIZENSHIP PATH AT 6 YEARS',d:'Fund or donation route.',f:{ru:'RU/BY — SELECTED OPTIONS FROM 2026'}},
+  uaeco:{n:'UAE · Company route',m:'FROM 3 WEEKS · 2-YEAR RESIDENCE',d:'No property or deposit required — company setup only.'},
+  qatarbiz:{n:'Qatar · Business route',m:'1–2 MONTHS · 2-YEAR RESIDENCE',d:'Annual licence; local banking.'},
+  e2:{n:'US · E-2',m:'RENEWABLE · OWN US BUSINESS FROM ~$100,000',d:'Requires treaty-country citizenship — where none is held, Turkey or Grenada provides the structuring step.'},
+  l1:{n:'US · L-1',m:'UP TO 7 YEARS · GREEN-CARD PATH VIA EB-1C',d:'A transfer within your own operating company to its US office.'},
+  eb5:{n:'US · EB-5',m:'12–36 MONTHS · CONDITIONAL GREEN CARD · CITIZENSHIP ELIGIBLE AT 5 YEARS',d:'Investment in a job-creating US enterprise; over 90% invest passively via regional centres. Open to all nationalities.',f:{cn:'MAINLAND-BORN QUEUE IN THE UNRESERVED CATEGORY — RURAL AND HIGH-UNEMPLOYMENT SET-ASIDES REVIEWED AT ASSESSMENT'}},
+  fin:{n:'France · Italy · Spain · Portugal — financially independent',m:'FIRST RENEWAL AFTER 1 YEAR',d:'Proof of funds, no investment. Italy lifts the €100,000 EU bank cap.'},
+  monaco:{n:'Monaco · Financially independent',m:'1-YEAR CARD · 10-YEAR CARD AFTER 5 YEARS',d:'Bank-deposit route; 183 days a year in residence.'},
+  malta:{n:'Malta · Global Residence',m:'NO MINIMUM STAY',d:'Property or rental basis; 15% tax on remitted income.'},
+  andorra:{n:'Andorra · Investment residence',m:'90 DAYS/YEAR',d:'Lifts the CHF cap in Swiss banks.'},
+  greecedn:{n:'Greece · Digital Nomad',m:'UP TO 2 YEARS, RENEWABLE',d:'Income from abroad.'},
+  cisr:{n:'Armenia · Georgia · Uzbekistan · Kazakhstan',m:'CARDS FROM 1 TO 10 YEARS',d:'Business, employment or property basis. Banking and a fallback base.'}
+},
+res:{
+  r_israel:{t:'Origin-based citizenship.'},
+  r_cit_low:{t:'Citizenship by contribution — entry tier.',note:'NATURALISATION VIA RESIDENCE REMAINS THE STRUCTURAL ALTERNATIVE'},
+  r_cit_mid:{t:'Citizenship by contribution or real estate.'},
+  r_cit_high:{t:'Citizenship at the top tier.'},
+  r_cit_none:{t:'No contribution — then citizenship follows residence.',note:'CITIZENSHIP BY TIME: PORTUGAL PATH AT 6 YEARS · PANAMA AND BULGARIA POSSIBLE AT 5 · SPAIN — 10'},
+  r_pr_eu:{t:'Permanent residence in the EU.',note:'10-YEAR CARDS (HUNGARY, UAE) MEET MOST PR NEEDS WITHOUT PR STATUS'},
+  r_pr_gulf:{t:'Permanent residence in the Gulf.'},
+  r_pr_am:{t:'Permanent residence, territorial taxation.'},
+  r_pr_all:{t:'Permanent residence — matched at assessment.'},
+  r_res_merit:{t:'Merit residence — qualification, not capital.',jump:'The goal is the UK or US — switch to that route'},
+  r_res_income:{t:'Residence on remote income.'},
+  r_res_funds:{t:'Residence on proof of funds — no investment.',note:'UAE GOLDEN VISA BY NOMINATION — QUALIFYING INCOME, NO ASSET PLACED'},
+  r_res_biz:{t:'Residence through your own business.'},
+  r_res_invest:{t:'Investment residence.'},
+  r_res_budget:{t:'A fallback base at minimal cost.'},
+  r_gt:{t:'The strongest route to the UK.',note:'THE UK INVESTOR VISA CLOSED IN 02.2022 — MERIT IS THE ROUTE'},
+  r_inf:{t:'The founder route to the UK.'},
+  r_uk_none:{t:'No capital route to the UK exists.',note:'THE INVESTOR VISA CLOSED IN 02.2022. MERIT PROFILES ARE OFTEN STRONGER THAN THEY LOOK — THE WRITTEN ASSESSMENT ESTABLISHES THIS. ALTERNATIVE: AN EU BASE'},
+  r_o1:{t:'The merit route to the US.'},
+  r_l1:{t:'The corporate route to the US.'},
+  r_e2:{t:'The treaty route to the US.'},
+  r_e2t:{t:'The treaty route to the US — built in two steps.',note:'SEQUENCE: TREATY CITIZENSHIP FIRST, THEN E-2 INTO YOUR OWN US BUSINESS'},
+  r_eb5:{t:'The direct green-card route to the US.',note:'NO MERIT PROFILE, NO TREATY PASSPORT, NO DAY-TO-DAY BUSINESS TO RUN'},
+  r_us_none:{t:'The route is established at assessment.',note:'MERIT PROFILES ARE OFTEN RECOVERABLE FROM A CAREER RECORD — THE WRITTEN ASSESSMENT ESTABLISHES THIS'},
+  r_cap_dn:{t:'The fastest permit for your profile.',note:'ANY EU RESIDENCE PERMIT LIFTS THE €100,000 CAP · CHF CAP IN SWISS BANKS — ANDORRA'},
+  r_cap_ct:{t:'The fastest permit for your profile.',note:'ANY EU RESIDENCE PERMIT LIFTS THE €100,000 CAP · CHF CAP IN SWISS BANKS — ANDORRA'},
+  r_cap_fin:{t:'The fastest permit for your profile.',note:'ITALY LIFTS THE CAP DIRECTLY · CHF CAP IN SWISS BANKS — ANDORRA'},
+  r_cap_inv:{t:'The fastest permit for your profile.',note:'ANY EU RESIDENCE PERMIT LIFTS THE €100,000 CAP'},
+  r_cap_none:{t:'No EU permit route — then banking outside the perimeter.',note:'THE €100,000 CAP APPLIES INSIDE THE EU — UAE, QATAR AND CIS BANKING SIT OUTSIDE IT'},
+  r_ops:{t:'An operating base outside the restrictions.'},
+  r_closed:{t:'Open equivalents of closed programmes.',note:'CARIBBEAN CBI SUSPENDED FOR RU/BY 2022–23 · MALTA CLOSED FOR ALL 2025'}
+}},
+
+/* ---------------- RU ---------------- */
+ru:{
+ui:{kicker:'Подбор маршрута · Предварительно', back:'&larr; Назад', restart:'Начать заново', cta:'Запросить оценку',
+    ctaNote:'Письменная оценка — бесплатно, за 5 рабочих дней<br>Стоимость фиксируется в engagement letter',
+    rlabel:'Предварительный маршрут', rlabel2:'Также рассматривается на оценке',
+    perimeter:'Носит ориентировочный характер — маршрут подтверждается письменной оценкой, бесплатно, в течение пяти рабочих дней · Санкционный скрининг и source-of-funds до любого сотрудничества · Страница не собирает и не хранит данные',
+    mailHead:'Профиль из подбора маршрута:', mailTail:'Цель:\nСроки:\n\n'},
+cnCit:'ЗАКОН КНР О ГРАЖДАНСТВЕ — ДОБРОВОЛЬНОЕ ПОЛУЧЕНИЕ ИНОСТРАННОГО ГРАЖДАНСТВА ПРЕКРАЩАЕТ КИТАЙСКОЕ · УЧИТЫВАЕТСЯ В МАРШРУТЕ НА ОЦЕНКЕ',
+nodes:{
+  passport:{q:'Какой у вас паспорт?',k:'ПАСПОРТ',o:[['Россия / Беларусь','Список программ учитывает действующие ограничения'],['Китай','Список программ учитывает правила для паспорта КНР'],['Другие страны СНГ','Полная матрица, проверка по паспорту на оценке'],['Другой','Полная матрица']]},
+  goal:{q:'Что должно быть в итоге?',k:'ЦЕЛЬ',o:[['Второе гражданство','Паспорт, мобильность, структурирование'],['ПМЖ сразу','Долгий статус без предварительной натурализации'],['База — вид на жительство','Релокация, семья, мобильность, налоги'],['Конкретная страна — UK, США или ЕС','Сначала страна, потом маршрут'],['Снять конкретное ограничение','Банковские лимиты, платежи, закрывшаяся программа']]},
+  jewish:{q:'Еврейские корни — вы, родители, бабушки или дедушки?',k:'ПРОИСХОЖДЕНИЕ',o:[['Да','Гражданство по происхождению, без инвестиций'],['Нет','']]},
+  budget:{q:'Бюджет вклада?',k:'БЮДЖЕТ',o:[['До ~$150,000',''],['~$150,000 – 500,000',''],['$500,000 и выше',''],['Капитала нет','Натурализация — сначала ВНЖ']]},
+  region:{q:'Какой регион?',k:'РЕГИОН',o:[['Европейский союз',''],['Залив',''],['Америки · территориальное налогообложение',''],['Открыт — лучший структурный вариант','']]},
+  profile:{q:'Что описывает вас точнее всего?',k:'ПРОФИЛЬ',o:[['Документированные достижения, основатель или специалист','Merit-маршруты — без заморозки капитала'],['Удалённый доход от ~€2,800 в месяц',''],['Накопления или пассивный доход','Без инвестиций'],['Собственный действующий бизнес',''],['Капитал, готовый к размещению','ВНЖ за инвестиции'],['Минимальный бюджет — запасная база','']]},
+  which:{q:'Какая страна?',k:'СТРАНА',o:[['Великобритания',''],['США',''],['Европейский союз','']]},
+  ukq:{q:'Есть документированные достижения в tech, науке или искусстве — или бизнес, который вы готовы вести в UK?',k:'ПРОФИЛЬ UK',o:[['Документированные достижения','Награды, пресса, руководящие роли, экзит'],['Бизнес, который создам и буду вести',''],['Похоже, ни то, ни другое','']]},
+  usq:{q:'Что описывает вас точнее всего?',k:'ПРОФИЛЬ США',o:[['Документированная карьера или проданная компания',''],['Действующая компания за пределами США',''],['Есть паспорт treaty-страны','E-2 напрямую'],['Капитал ~$500,000 — активный бизнес в США','Сначала гражданство treaty-страны, затем виза инвестора'],['Капитал от ~$800,000 — пассивный маршрут','Грин-карта за инвестицию'],['Ничего из перечисленного','']]},
+  limit:{q:'Какое ограничение?',k:'ОГРАНИЧЕНИЕ',o:[['Счета в банках ЕС ограничены €100,000',''],['Платежи, контракты, операционные ограничения',''],['Программа, которую планировал, закрылась','Карибы, Мальта, голден-визы']]},
+  capprofile:{q:'Лимит снимает любой ВНЖ ЕС. Какой путь к нему вам подходит?',k:'ПРОФИЛЬ',o:[['Удалённый доход от ~€2,800 в месяц',''],['Основатель или специалист',''],['Накопления или пассивный доход',''],['Капитал к размещению',''],['Ничего из перечисленного','']]}
+},
+progs:{
+  gt:{n:'Великобритания · Global Talent',m:'8–14 НЕДЕЛЬ · ILR ЧЕРЕЗ 3–5 ЛЕТ · СЕМЬЯ ВКЛЮЧЕНА',d:'Эндорсмент достижений в технологиях, науке или искусстве. Без работодателя и инвестиций.'},
+  inf:{n:'Великобритания · Innovator Founder',m:'3–4 МЕСЯЦА · ILR ЧЕРЕЗ 3 ГОДА · СЕМЬЯ ВКЛЮЧЕНА',d:'Эндорсмент инновационного, жизнеспособного, масштабируемого бизнеса. Без фиксированного минимума инвестиций.'},
+  o1:{n:'США · O-1 → EB-1',m:'ПОДГОТОВКА 6–10 НЕД + 15 РАБ. ДНЕЙ (PREMIUM)',d:'Extraordinary ability. У O-1 нет годовой квоты; EB-1 — грин-карта по self-petition.',f:{cn:'EB-1 ДЛЯ РОЖДЁННЫХ В МАТЕРИКОВОМ КИТАЕ — МНОГОЛЕТНЯЯ ОЧЕРЕДЬ; O-1 НЕ ЗАТРОНУТ'}},
+  ct:{n:'Франция · Carte Talent',m:'2–4 МЕСЯЦА · КАРТА 4 ГОДА · СЕМЬЯ НА ТОТ ЖЕ СРОК',d:'Основатели, квалифицированные специалисты, инвесторы в собственный проект.'},
+  dn:{n:'Испания · Digital Nomad',m:'1–3 МЕСЯЦА · КАРТА 3 ГОДА · ПМЖ ЧЕРЕЗ 5 ЛЕТ',d:'Документированный удалённый доход от ~€2,800/мес. Семья в одном заявлении.'},
+  israel:{n:'Израиль · Репатриация',m:'ПО ПРОИСХОЖДЕНИЮ · БЕЗ ИНВЕСТИЦИЙ · 155+ НАПРАВЛЕНИЙ',d:'Гражданство по корням: архивы, досье и консульский процесс.'},
+  turkey:{n:'Турция · Гражданство',m:'4–8 МЕС · 100+ НАПРАВЛЕНИЙ · ШЛЮЗ К US E-2',d:'Через недвижимость или финансовый маршрут. Инструмент структурирования, не только паспорт.'},
+  vanuatu:{n:'Вануату · Гражданство',m:'1–2 МЕС · САМАЯ БЫСТРАЯ ОТКРЫТАЯ ПРОГРАММА',d:'Взнос. Безвиз с Шенгеном и UK отменён в 2023–24 — сверяется с целью на оценке.'},
+  saotome:{n:'Сан-Томе и Принсипи',m:'2–5 МЕС · ДЕТИ ДО 30 · РОДИТЕЛИ 55+',d:'Взнос; самый широкий состав семьи среди открытых программ.'},
+  nauru:{n:'Науру · Гражданство',m:'3–4 МЕС',d:'Доступ: UK, Сингапур, Гонконг, ОАЭ, Ирландия.',f:{ru:'ОГРАНИЧЕНО ДЛЯ ПАСПОРТОВ RU/BY'}},
+  grenada:{n:'Гренада · Гражданство',m:'ДОГОВОРНАЯ СТРАНА US E-2',d:'Взнос или недвижимость; прямая связка с бизнес-визой E-2.',f:{ru:'ПРИОСТАНОВЛЕНО ДЛЯ RU/BY С 2023'}},
+  elsal:{n:'Эль-Сальвадор · Гражданство',m:'1–3 МЕС · КВОТА 1,000/ГОД',d:'USD, BTC или USDT. Семья без доплаты. Доступ: Шенген, Япония, Корея.'},
+  cyprus:{n:'Кипр · ПМЖ',m:'2–3 МЕС',d:'Быстрый постоянный статус в ЕС; снимает лимит €100,000. Сам по себе не даёт шенген-безвиза.'},
+  bulgaria:{n:'Болгария · ПМЖ',m:'6–8 МЕС · ПУТЬ К ГРАЖДАНСТВУ ЕС ЧЕРЕЗ 5 ЛЕТ',d:'Возвратная инвестиция или финансирование; без требования проживания.'},
+  panama:{n:'Панама · ПМЖ',m:'2–4 МЕС · 1 ВИЗИТ В 2 ГОДА',d:'Территориальное налогообложение. Гражданство возможно через 5 лет.'},
+  qatarpr:{n:'Катар · ПМЖ',m:'ОТ 3 НЕДЕЛЬ',d:'Катарский банкинг, без подоходного налога.'},
+  saudi:{n:'Саудовская Аравия · Premium residency',m:'1–3 МЕС',d:'Годовая или пожизненная премия; местный банкинг и компании.'},
+  hungary:{n:'Венгрия · Guest investor',m:'3–6 МЕС · КАРТА 10 ЛЕТ + ПРОДЛЕНИЕ НА 10',d:'Возвратная инвестиция в фонд; безлимитный Шенген, без требования проживания.'},
+  uaegv:{n:'ОАЭ · Golden Visa',m:'ОТ НЕСКОЛЬКИХ ДНЕЙ ДО 3 МЕС · 10 ЛЕТ · БЕЗ МИНИМАЛЬНОГО ПРЕБЫВАНИЯ',d:'Через актив — или номинация по доходу, вообще без актива. Семья и персонал.'},
+  greecegv:{n:'Греция · Golden Visa',m:'3–6 МЕС · КАРТА 5 ЛЕТ',d:'Аренда разрешена.',f:{ru:'RU/BY — ТОЛЬКО ПРИ АЛЬТЕРНАТИВНОМ ГРАЖДАНСТВЕ'}},
+  portgv:{n:'Португалия · Golden Visa',m:'6–12 МЕС · 8 ДНЕЙ/ГОД · ПУТЬ К ГРАЖДАНСТВУ С 6 ЛЕТ',d:'Фонд или пожертвование.',f:{ru:'RU/BY — С 2026 ОТДЕЛЬНЫЕ ОПЦИИ'}},
+  uaeco:{n:'ОАЭ · Через компанию',m:'ОТ 3 НЕДЕЛЬ · ВНЖ 2 ГОДА',d:'Без недвижимости и депозита — только расходы на компанию.'},
+  qatarbiz:{n:'Катар · Через бизнес',m:'1–2 МЕС · ВНЖ 2 ГОДА',d:'Ежегодная лицензия; местный банкинг.'},
+  e2:{n:'США · E-2',m:'ПРОДЛЕВАЕТСЯ · СВОЙ БИЗНЕС В США ОТ ~$100,000',d:'Нужно гражданство treaty-страны — если его нет, шагом структурирования становится Турция или Гренада.'},
+  l1:{n:'США · L-1',m:'ДО 7 ЛЕТ · ПУТЬ К ГРИН-КАРТЕ ЧЕРЕЗ EB-1C',d:'Перевод внутри собственной действующей компании в её офис в США.'},
+  eb5:{n:'США · EB-5',m:'12–36 МЕС · УСЛОВНАЯ ГРИН-КАРТА · ГРАЖДАНСТВО С 5 ЛЕТ',d:'Инвестиция в создающее рабочие места предприятие в США; ~90% инвестируют пассивно через региональные центры. Открыто для всех гражданств.',f:{cn:'ДЛЯ РОЖДЁННЫХ В МАТЕРИКОВОМ КИТАЕ — ОЧЕРЕДЬ В БАЗОВОЙ КАТЕГОРИИ; SET-ASIDE (СЕЛО / БЕЗРАБОТИЦА) — НА ОЦЕНКЕ'}},
+  fin:{n:'Франция · Италия · Испания · Португалия — фин. независимость',m:'ПЕРВОЕ ПРОДЛЕНИЕ ЧЕРЕЗ 1 ГОД',d:'Подтверждение средств, без инвестиций. Италия снимает лимит €100,000.'},
+  monaco:{n:'Монако · Фин. независимость',m:'КАРТА 1 ГОД · КАРТА 10 ЛЕТ ПОСЛЕ 5 ЛЕТ',d:'Банковский депозит; 183 дня в году.'},
+  malta:{n:'Мальта · Global Residence',m:'БЕЗ МИНИМАЛЬНОГО ПРЕБЫВАНИЯ',d:'Недвижимость или аренда; 15% на переведённый доход.'},
+  andorra:{n:'Андорра · ВНЖ за инвестиции',m:'90 ДНЕЙ/ГОД',d:'Снимает лимит CHF в швейцарских банках.'},
+  greecedn:{n:'Греция · Digital Nomad',m:'ДО 2 ЛЕТ, ПРОДЛЕВАЕТСЯ',d:'Доход из-за рубежа.'},
+  cisr:{n:'Армения · Грузия · Узбекистан · Казахстан',m:'КАРТЫ ОТ 1 ГОДА ДО 10 ЛЕТ',d:'Бизнес, работа или недвижимость. Банкинг и запасная база.'}
+},
+res:{
+  r_israel:{t:'Гражданство по происхождению.'},
+  r_cit_low:{t:'Гражданство за взнос — входной уровень.',note:'СТРУКТУРНАЯ АЛЬТЕРНАТИВА — НАТУРАЛИЗАЦИЯ ЧЕРЕЗ ВНЖ'},
+  r_cit_mid:{t:'Гражданство за взнос или недвижимость.'},
+  r_cit_high:{t:'Гражданство — верхний уровень.'},
+  r_cit_none:{t:'Без взноса — гражданство через резидентство.',note:'ГРАЖДАНСТВО ПО СРОКУ: ПОРТУГАЛИЯ — С 6 ЛЕТ · ПАНАМА И БОЛГАРИЯ — ВОЗМОЖНО С 5 · ИСПАНИЯ — 10'},
+  r_pr_eu:{t:'ПМЖ в Европейском союзе.',note:'10-ЛЕТНИЕ КАРТЫ (ВЕНГРИЯ, ОАЭ) ЗАКРЫВАЮТ БОЛЬШИНСТВО ЗАДАЧ ПМЖ БЕЗ СТАТУСА ПМЖ'},
+  r_pr_gulf:{t:'ПМЖ в странах Залива.'},
+  r_pr_am:{t:'ПМЖ, территориальное налогообложение.'},
+  r_pr_all:{t:'ПМЖ — подбирается на оценке.'},
+  r_res_merit:{t:'Merit-резидентство — квалификация, не капитал.',jump:'Цель — UK или США: сменить ветку'},
+  r_res_income:{t:'ВНЖ на удалённый доход.'},
+  r_res_funds:{t:'ВНЖ по подтверждению средств — без инвестиций.',note:'UAE GOLDEN VISA ПО НОМИНАЦИИ — КВАЛИФИЦИРУЮЩИЙ ДОХОД, БЕЗ РАЗМЕЩЕНИЯ АКТИВА'},
+  r_res_biz:{t:'ВНЖ через собственный бизнес.'},
+  r_res_invest:{t:'ВНЖ за инвестиции.'},
+  r_res_budget:{t:'Запасная база с минимальными затратами.'},
+  r_gt:{t:'Сильнейший маршрут в UK.',note:'ИНВЕСТ-ВИЗА В UK ЗАКРЫТА С 02.2022 — МАРШРУТ ИДЁТ ЧЕРЕЗ MERIT'},
+  r_inf:{t:'Маршрут основателя в UK.'},
+  r_uk_none:{t:'Капитального маршрута в UK не существует.',note:'ИНВЕСТ-ВИЗА ЗАКРЫТА С 02.2022. MERIT-ПРОФИЛЬ ЧАСТО СИЛЬНЕЕ, ЧЕМ КАЖЕТСЯ, — ЭТО УСТАНАВЛИВАЕТ ПИСЬМЕННАЯ ОЦЕНКА. АЛЬТЕРНАТИВА — БАЗА В ЕС'},
+  r_o1:{t:'Merit-маршрут в США.'},
+  r_l1:{t:'Корпоративный маршрут в США.'},
+  r_e2:{t:'Treaty-маршрут в США.'},
+  r_e2t:{t:'Treaty-маршрут в США — в два шага.',note:'ПОСЛЕДОВАТЕЛЬНОСТЬ: СНАЧАЛА ГРАЖДАНСТВО TREATY-СТРАНЫ, ЗАТЕМ E-2 В СВОЙ БИЗНЕС В США'},
+  r_eb5:{t:'Прямой маршрут к грин-карте.',note:'НЕ ТРЕБУЮТСЯ MERIT-ПРОФИЛЬ, TREATY-ПАСПОРТ ИЛИ УПРАВЛЕНИЕ БИЗНЕСОМ'},
+  r_us_none:{t:'Маршрут устанавливается на оценке.',note:'MERIT-ПРОФИЛЬ ЧАСТО ВОССТАНОВИМ ПО АРХИВУ КАРЬЕРЫ — ЭТО УСТАНАВЛИВАЕТ ПИСЬМЕННАЯ ОЦЕНКА'},
+  r_cap_dn:{t:'Быстрейший ВНЖ для вашего профиля.',note:'ЛИМИТ €100,000 СНИМАЕТ ЛЮБОЙ ВНЖ ЕС · ЛИМИТ CHF В ШВЕЙЦАРСКИХ БАНКАХ — АНДОРРА'},
+  r_cap_ct:{t:'Быстрейший ВНЖ для вашего профиля.',note:'ЛИМИТ €100,000 СНИМАЕТ ЛЮБОЙ ВНЖ ЕС · ЛИМИТ CHF В ШВЕЙЦАРСКИХ БАНКАХ — АНДОРРА'},
+  r_cap_fin:{t:'Быстрейший ВНЖ для вашего профиля.',note:'ИТАЛИЯ СНИМАЕТ ЛИМИТ НАПРЯМУЮ · ЛИМИТ CHF — АНДОРРА'},
+  r_cap_inv:{t:'Быстрейший ВНЖ для вашего профиля.',note:'ЛИМИТ €100,000 СНИМАЕТ ЛЮБОЙ ВНЖ ЕС'},
+  r_cap_none:{t:'Без ВНЖ ЕС — банкинг вне периметра.',note:'ЛИМИТ €100,000 ДЕЙСТВУЕТ ВНУТРИ ЕС — БАНКИ ОАЭ, КАТАРА И СНГ ВНЕ ЕГО ДЕЙСТВИЯ'},
+  r_ops:{t:'Операционная база вне ограничений.'},
+  r_closed:{t:'Открытые эквиваленты закрытых программ.',note:'КАРИБСКИЕ CBI ПРИОСТАНОВЛЕНЫ ДЛЯ RU/BY 2022–23 · МАЛЬТА ЗАКРЫТА ДЛЯ ВСЕХ 2025'}
+}},
+
+/* ---------------- ZH ---------------- */
+zh:{
+ui:{kicker:'路线初筛 · 仅供参考', back:'&larr; 返回', restart:'重新开始', cta:'申请评估',
+    ctaNote:'书面评估——免费，五个工作日内<br>费用在委托协议中固定',
+    rlabel:'初步路线', rlabel2:'评估时一并考虑',
+    perimeter:'仅供参考——路线以书面评估确认，免费，五个工作日内 · 任何合作前进行制裁与资金来源审查 · 本页面不收集、不存储任何数据',
+    mailHead:'路线初筛摘要：', mailTail:'目的：\n时间：\n\n'},
+cnCit:'中国国籍法：定居外国并自愿取得外国国籍者，自动丧失中国国籍 · 评估时纳入路线考量',
+nodes:{
+  passport:{q:'您持有哪国护照？',k:'护照',o:[['俄罗斯 / 白俄罗斯','项目清单已按现行限制调整'],['中国','项目清单已按中国护照的相关规定调整'],['其他独联体国家','完整清单，评估时按护照核实'],['其他','完整清单']]},
+  goal:{q:'您的最终目标是什么？',k:'目标',o:[['第二国籍','护照、通行便利、架构安排'],['直接获得永久居留','无需先入籍的长期身份'],['海外居留基地','安家、家庭、通行、税务'],['特定国家——英国、美国或欧盟','先定目的地，再定路线'],['解决一项具体限制','银行限额、支付、已关闭的项目']]},
+  jewish:{q:'是否有犹太血统——本人、父母或祖父母？',k:'血统',o:[['是','凭血统入籍，无需投资'],['否','']]},
+  budget:{q:'出资预算？',k:'预算',o:[['约15万美元以内',''],['约15万–50万美元',''],['50万美元以上',''],['暂无可投入资金','归化路径——先取得居留']]},
+  region:{q:'哪个地区？',k:'地区',o:[['欧盟',''],['海湾地区',''],['美洲 · 属地征税',''],['不限——评估时匹配最优方案','']]},
+  profile:{q:'以下哪项最符合您的情况？',k:'情况',o:[['有据可查的成就、创始人或专业人士','Merit 路线——无需锁定资本'],['每月约€2,800以上的远程收入',''],['存款或被动收入','无需投资'],['拥有经营中的企业',''],['可用于投资的资金','投资居留'],['预算有限——备用基地','']]},
+  which:{q:'哪个目的地？',k:'目的地',o:[['英国',''],['美国',''],['欧盟','']]},
+  ukq:{q:'您是否在科技、科学或艺术领域有可证明的成就——或愿意在英国经营一家企业？',k:'英国情况',o:[['有可证明的成就','奖项、媒体报道、高管职位、公司出售'],['将创办并经营的企业',''],['似乎都没有','']]},
+  usq:{q:'以下哪项最符合您的情况？',k:'美国情况',o:[['有据可查的职业履历或已出售的公司',''],['在美国境外有经营中的公司',''],['持有条约国护照','可直接申请 E-2'],['约50万美元资金——在美经营企业','先取得条约国公民身份，再办投资签证'],['约80万美元以上——被动路线','投资直通绿卡'],['以上都不是','']]},
+  limit:{q:'哪项限制？',k:'限制',o:[['欧盟银行账户被限制在10万欧元',''],['支付、合同、经营受限',''],['原计划的项目已关闭','加勒比、马耳他、黄金签证']]},
+  capprofile:{q:'任何欧盟居留许可均可解除该限额。哪条路径适合您？',k:'路径',o:[['每月约€2,800以上的远程收入',''],['创始人或专业人士',''],['存款或被动收入',''],['可投资的资金',''],['以上都不是','']]}
+},
+progs:{
+  gt:{n:'英国 · Global Talent',m:'8–14周 · 3–5年获永居 · 含家庭成员',d:'科技、科学或艺术领域成就的官方背书。无需雇主，无需投资。'},
+  inf:{n:'英国 · Innovator Founder',m:'3–4个月 · 3年获永居 · 含家庭成员',d:'创新、可行、可扩展商业计划的背书。无固定最低投资额。'},
+  o1:{n:'美国 · O-1 → EB-1',m:'准备6–10周 + 审理15个工作日（加急）',d:'杰出人才类别。O-1无年度配额；EB-1可自行申请绿卡。',f:{cn:'中国大陆出生者EB-1排期多年；O-1不受影响'}},
+  ct:{n:'法国 · Carte Talent',m:'2–4个月 · 4年卡 · 家庭成员同期',d:'创始人、高级专业人士、自有项目投资人。'},
+  dn:{n:'西班牙 · Digital Nomad',m:'1–3个月 · 3年卡 · 5年获永居',d:'约€2,800+/月的远程收入，需文件证明。全家一份申请。'},
+  israel:{n:'以色列 · 回归',m:'凭血统 · 无需投资 · 155+免签目的地',d:'凭血统入籍：档案调取、案卷准备与领事程序。'},
+  turkey:{n:'土耳其 · 公民身份',m:'4–8个月 · 100+免签目的地 · 通往美国E-2',d:'房产或金融路线。既是护照，也是架构工具。'},
+  vanuatu:{n:'瓦努阿图 · 公民身份',m:'1–2个月 · 现行最快项目',d:'捐款路线。申根与英国免签已于2023–24年取消——评估时与目标核对。'},
+  saotome:{n:'圣多美和普林西比',m:'2–5个月 · 子女至30岁 · 父母55岁以上',d:'捐款路线；现行项目中可随行的家庭范围最广。'},
+  nauru:{n:'瑙鲁 · 公民身份',m:'3–4个月',d:'通行英国、新加坡、香港、阿联酋、爱尔兰。',f:{ru:'对俄/白护照有限制'}},
+  grenada:{n:'格林纳达 · 公民身份',m:'美国E-2条约国',d:'捐款或房产路线；与美国E-2投资签证直接配套。',f:{ru:'对俄/白护照自2023年起暂停'}},
+  elsal:{n:'萨尔瓦多 · 公民身份',m:'1–3个月 · 每年配额1,000',d:'接受美元、BTC或USDT。家庭成员无需额外出资。通行申根、日本、韩国。'},
+  cyprus:{n:'塞浦路斯 · 永久居留',m:'2–3个月',d:'快速取得欧盟永久身份；解除10万欧元银行限额。本身不含申根免签通行。'},
+  bulgaria:{n:'保加利亚 · 永久居留',m:'6–8个月 · 5年后可申请欧盟公民身份',d:'可返还投资或融资方案；无居住要求。'},
+  panama:{n:'巴拿马 · 永久居留',m:'2–4个月 · 每两年入境一次即可',d:'属地征税。5年后可申请入籍。'},
+  qatarpr:{n:'卡塔尔 · 永久居留',m:'最快3周',d:'卡塔尔银行服务，无个人所得税。'},
+  saudi:{n:'沙特阿拉伯 · 高级居留',m:'1–3个月',d:'按年缴费或终身方案；本地银行与公司。'},
+  hungary:{n:'匈牙利 · 投资者居留',m:'3–6个月 · 10年卡+10年续期',d:'可返还基金投资；申根不限次通行，无居住要求。'},
+  uaegv:{n:'阿联酋 · 黄金签证',m:'数天至3个月 · 10年 · 无最短停留',d:'资产路线——或凭收入提名，完全无需资产。含家庭成员与家政人员。'},
+  greecegv:{n:'希腊 · 黄金签证',m:'3–6个月 · 5年卡',d:'允许出租。',f:{ru:'俄/白护照——须持替代国籍'}},
+  portgv:{n:'葡萄牙 · 黄金签证',m:'6–12个月 · 每年8天 · 6年可申请入籍',d:'基金或捐赠路线。',f:{ru:'俄/白护照——2026年起部分选项'}},
+  uaeco:{n:'阿联酋 · 公司路线',m:'最快3周 · 2年居留',d:'无需房产或存款——仅公司设立费用。'},
+  qatarbiz:{n:'卡塔尔 · 商业路线',m:'1–2个月 · 2年居留',d:'年度牌照；本地银行服务。'},
+  e2:{n:'美国 · E-2',m:'可续签 · 自有美国企业约10万美元起',d:'需条约国公民身份——如无，可先经土耳其或格林纳达取得。'},
+  l1:{n:'美国 · L-1',m:'最长7年 · 经EB-1C通往绿卡',d:'经自有公司内部调动，派驻其美国办公室。'},
+  eb5:{n:'美国 · EB-5',m:'12–36个月 · 有条件绿卡 · 5年可申请入籍',d:'投资于创造就业的美国企业；约90%经区域中心被动投资。不限国籍。',f:{cn:'中国大陆出生者基础类别有排期；乡村/高失业区预留类别评估时核实'}},
+  fin:{n:'法国 · 意大利 · 西班牙 · 葡萄牙——财务独立',m:'1年后首次续期',d:'资金证明，无需投资。意大利可解除10万欧元银行限额。'},
+  monaco:{n:'摩纳哥 · 财务独立',m:'1年卡 · 满5年后发10年卡',d:'银行存款路线；每年须居住183天。'},
+  malta:{n:'马耳他 · Global Residence',m:'无最短停留',d:'购房或租房；汇入收入按15%征税。'},
+  andorra:{n:'安道尔 · 投资居留',m:'每年90天',d:'解除瑞士银行的瑞郎限额。'},
+  greecedn:{n:'希腊 · Digital Nomad',m:'最长2年，可续',d:'来自境外的收入。'},
+  cisr:{n:'亚美尼亚 · 格鲁吉亚 · 乌兹别克斯坦 · 哈萨克斯坦',m:'1至10年卡',d:'经商、就业或置业。银行服务与备用基地。'}
+},
+res:{
+  r_israel:{t:'凭血统的公民身份。'},
+  r_cit_low:{t:'捐款入籍——入门级方案。',note:'结构性替代方案——经居留归化入籍'},
+  r_cit_mid:{t:'捐款或购房入籍。'},
+  r_cit_high:{t:'公民身份——高预算方案。'},
+  r_cit_none:{t:'无需出资——先居留，后入籍。',note:'按居住年限入籍：葡萄牙6年 · 巴拿马与保加利亚可5年 · 西班牙10年'},
+  r_pr_eu:{t:'欧盟永久居留。',note:'10年卡（匈牙利、阿联酋）可覆盖多数永居需求而无需永居身份'},
+  r_pr_gulf:{t:'海湾地区永久居留。'},
+  r_pr_am:{t:'永久居留，属地征税。'},
+  r_pr_all:{t:'永久居留——评估时匹配。'},
+  r_res_merit:{t:'Merit 居留——凭资历，而非资本。',jump:'目标是英国或美国——转至相应路线'},
+  r_res_income:{t:'凭远程收入居留。'},
+  r_res_funds:{t:'凭资金证明居留——无需投资。',note:'阿联酋黄金签证可凭收入提名——无需配置资产'},
+  r_res_biz:{t:'经自有企业取得居留。'},
+  r_res_invest:{t:'投资居留。'},
+  r_res_budget:{t:'低成本备用基地。'},
+  r_gt:{t:'通往英国的最强路线。',note:'英国投资签证已于2022年2月关闭——Merit 是唯一路线'},
+  r_inf:{t:'通往英国的创始人路线。'},
+  r_uk_none:{t:'不存在通往英国的资本路线。',note:'投资签证已于2022年2月关闭。Merit 资历往往强于本人预期——由书面评估确认。替代方案：欧盟基地'},
+  r_o1:{t:'通往美国的 Merit 路线。'},
+  r_l1:{t:'通往美国的公司路线。'},
+  r_e2:{t:'通往美国的条约路线。'},
+  r_e2t:{t:'通往美国的条约路线——分两步。',note:'顺序：先取得条约国公民身份，再以E-2投资自有美国企业'},
+  r_eb5:{t:'直通绿卡的路线。',note:'无需资历背景、条约国护照，亦无需亲自经营企业'},
+  r_us_none:{t:'路线由评估确定。',note:'从职业履历中往往可重建 Merit 资历——由书面评估确认'},
+  r_cap_dn:{t:'最快取得居留许可的路径。',note:'任何欧盟居留许可均可解除10万欧元限额 · 瑞士银行瑞郎限额——安道尔'},
+  r_cap_ct:{t:'最快取得居留许可的路径。',note:'任何欧盟居留许可均可解除10万欧元限额 · 瑞士银行瑞郎限额——安道尔'},
+  r_cap_fin:{t:'最快取得居留许可的路径。',note:'意大利可直接解除限额 · 瑞郎限额——安道尔'},
+  r_cap_inv:{t:'最快取得居留许可的路径。',note:'任何欧盟居留许可均可解除10万欧元限额'},
+  r_cap_none:{t:'无欧盟居留路径——改在限额之外办理银行业务。',note:'10万欧元限额仅适用于欧盟境内——阿联酋、卡塔尔与独联体银行不受其约束'},
+  r_ops:{t:'限制之外的运营基地。'},
+  r_closed:{t:'已关闭项目的现行替代方案。',note:'加勒比投资入籍对俄/白护照暂停（2022–23）· 马耳他项目已对所有国籍关闭（2025）'}
+}}
+};
+
+/* ================= ENGINE ================= */
+const qp = new URLSearchParams(location.search).get('lang');
+let lang = ['en','ru','zh'].includes(qp) ? qp : 'en';
+let stack = [];
+let cur = {type:'node', id:'passport'};
+const app = document.getElementById('app');
+
+function pv(){ return stack.length ? GRAPH.nodes[stack[0].node].opts[stack[0].optIndex].v : 'other'; }
+function nx(o){ return typeof o.next === 'string' ? o.next : (o.next[pv()] || o.next.default); }
+function resolve(list){
+  const ex = e => Array.isArray(e) ? e.includes(pv()) : e === pv();
+  return list.filter(e => typeof e === 'string' || ((!e.only || ex(e.only)) && (!e.not || !ex(e.not))))
+             .map(e => typeof e === 'string' ? e : e.k);
+}
+function chrome(){
+  document.getElementById('kicker').innerHTML = T[lang].ui.kicker;
+  document.getElementById('perimeter').innerHTML = T[lang].ui.perimeter;
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : lang;
+  document.getElementById('homelink').href = lang === 'en' ? 'index.html' : lang + '.html';
+  document.querySelectorAll('.langs a').forEach(a => a.classList.toggle('cur', a.dataset.lang === lang));
+}
+function trailHtml(){
+  return stack.map(s => {
+    const nt = T[lang].nodes[s.node];
+    return nt.k + ' — <b>' + nt.o[s.optIndex][0].toUpperCase() + '</b>';
+  }).join(' &nbsp;·&nbsp; ');
+}
+function renderNode(id){
+  cur = {type:'node', id};
+  const n = GRAPH.nodes[id], nt = T[lang].nodes[id];
+  app.innerHTML =
+    '<div class="trail">' + trailHtml() + '</div>' +
+    '<h2>' + nt.q + '</h2>' +
+    '<div class="opts">' + n.opts.map((o,i) =>
+      '<button class="opt" data-i="' + i + '"><span class="ol">' + nt.o[i][0] + '</span>' +
+      (nt.o[i][1] ? '<span class="od">' + nt.o[i][1] + '</span>' : '') + '</button>'
+    ).join('') + '</div>' +
+    (stack.length ? '<button class="back" id="back">' + T[lang].ui.back + '</button>' : '');
+  app.querySelectorAll('.opt').forEach(btn => btn.addEventListener('click', () => {
+    const i = +btn.dataset.i, o = n.opts[i];
+    stack.push({node:id, optIndex:i});
+    o.res ? renderResult(o.res) : renderNode(nx(o));
+  }));
+  const b = document.getElementById('back');
+  if(b) b.addEventListener('click', goBack);
+}
+function progHtml(key, small){
+  const p = T[lang].progs[key];
+  const flag = (p.f && p.f[pv()]) ? '<div class="resnote">' + p.f[pv()] + '</div>' : '';
+  return small
+    ? '<div class="alt"><div class="aname">' + p.n + '</div><div class="ameta">' + p.m + '</div>' + flag + '</div>'
+    : '<div class="prog"><div class="pname">' + p.n + '</div><div class="pmeta">' + p.m + '</div><div class="pdesc">' + p.d + '</div>' + flag + '</div>';
+}
+function renderResult(rid){
+  cur = {type:'res', id:rid};
+  const r = GRAPH.res[rid], rt = T[lang].res[rid];
+  const rp = resolve(r.p), ra = resolve(r.a);
+  const profile = stack.map(s => {
+    const nt = T[lang].nodes[s.node]; return nt.k + ': ' + nt.o[s.optIndex][0];
+  }).join('\n');
+  const mail = 'mailto:office@tacet.group?subject=Assessment%20request&body=' +
+    encodeURIComponent(T[lang].ui.mailHead + '\n' + profile + '\n\n' + T[lang].ui.mailTail);
+  app.innerHTML =
+    '<div class="trail">' + trailHtml() + '</div>' +
+    '<h2>' + rt.t + '</h2>' +
+    (rp.length ? '<div class="rescard"><div class="rlabel">' + T[lang].ui.rlabel + '</div>' +
+      rp.map(k => progHtml(k,false)).join('') + '</div>' : '') +
+    (ra.length ? '<div class="altblock"><div class="rlabel2">' + T[lang].ui.rlabel2 + '</div>' + ra.map(k => progHtml(k,true)).join('') + '</div>' : '') +
+    (rt.note ? '<div class="resnote" style="margin-top:22px;">' + rt.note + '</div>' : '') +
+    ((r.pn || []).includes(pv()) ? '<div class="resnote" style="margin-top:12px;">' + T[lang].cnCit + '</div>' : '') +
+    '<div class="cta-line"><a class="door" href="' + mail + '">' + T[lang].ui.cta + '</a>' +
+    '<span class="note">' + T[lang].ui.ctaNote + '</span></div>' +
+    '<button class="back" id="back">' + T[lang].ui.back + '</button> &nbsp;&nbsp;' +
+    (r.jump ? '<button class="back" id="jump">' + rt.jump + ' &rarr;</button> &nbsp;&nbsp;' : '') +
+    '<button class="back" id="restart">' + T[lang].ui.restart + '</button>';
+  document.getElementById('back').addEventListener('click', goBack);
+  document.getElementById('restart').addEventListener('click', () => { stack = []; renderNode('passport'); });
+  if(r.jump){
+    document.getElementById('jump').addEventListener('click', () => {
+      stack = [stack[0], {node:'goal', optIndex:r.jump.via}];
+      renderNode(r.jump.node);
+    });
+  }
+}
+function goBack(){
+  const last = stack.pop();
+  renderNode(last ? last.node : 'passport');
+}
+document.querySelectorAll('.langs a').forEach(a => a.addEventListener('click', e => {
+  e.preventDefault();
+  lang = a.dataset.lang;
+  chrome();
+  cur.type === 'node' ? renderNode(cur.id) : renderResult(cur.id);
+}));
+chrome();
+renderNode('passport');
+</script>
+</body>
+</html>
