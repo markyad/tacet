@@ -16,6 +16,10 @@
   .wrap{max-width:840px;margin:0 auto;padding:28px 40px 100px;}
   header.top{display:flex;justify-content:space-between;align-items:center;padding-bottom:22px;border-bottom:1px solid var(--hairline);margin-bottom:48px;}
   .wordmark-s{font-size:17px;letter-spacing:0.30em;padding-left:0.30em;text-decoration:none;color:var(--ink);}
+  header.top nav{display:flex;gap:34px;}
+  header.top nav a{white-space:nowrap;font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:10.5px;letter-spacing:0.2em;text-transform:uppercase;color:var(--graphite);text-decoration:none;}
+  header.top nav a:hover{color:var(--ink);}
+  @media (max-width:760px){header.top nav{display:none;}}
   .kicker{font-family:'IBM Plex Mono','Noto Sans SC',monospace;font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:var(--graphite);}
   .kicker::before{content:"";display:block;width:24px;height:1px;background:var(--hairline);margin-bottom:12px;}
   .kicker{margin-bottom:26px;}
@@ -56,6 +60,7 @@
 <div class="wrap">
   <header class="top">
     <a class="wordmark-s" id="homelink" href="index.html">TACET</a>
+    <nav id="rnav"></nav>
     <div class="langs"><a data-lang="en" class="cur">EN</a><a data-lang="ru">RU</a><a data-lang="zh">中文</a></div>
   </header>
   <div class="kicker" id="kicker"></div>
@@ -407,7 +412,12 @@ function chrome(){
   document.getElementById('kicker').innerHTML = T[lang].ui.kicker;
   document.getElementById('perimeter').innerHTML = T[lang].ui.perimeter;
   document.documentElement.lang = lang === 'zh' ? 'zh-Hans' : lang;
-  document.getElementById('homelink').href = lang === 'en' ? 'index.html' : lang + '.html';
+  const home = lang === 'en' ? 'index.html' : lang + '.html';
+  document.getElementById('homelink').href = home;
+  const NAV = {en:[['#about','About'],['#practice','Talent Practice'],['#contact','Contact']],
+               ru:[['#about','О нас'],['#practice','Talent Practice'],['#contact','Контакты']],
+               zh:[['#about','关于'],['#practice','人才项目'],['#contact','联系']]};
+  document.getElementById('rnav').innerHTML = NAV[lang].map(x => '<a href="' + home + x[0] + '">' + x[1] + '</a>').join('');
   document.querySelectorAll('.langs a').forEach(a => a.classList.toggle('cur', a.dataset.lang === lang));
 }
 function trailHtml(){
